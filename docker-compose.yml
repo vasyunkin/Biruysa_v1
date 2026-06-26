@@ -1,0 +1,10 @@
+services:
+  alligator:
+    build: .
+    container_name: alligator
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - TZ=UTC
