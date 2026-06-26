@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цифровой штурман аэролодки</title>
+    <!-- Подключаем стили Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Подключаем пользовательские стили -->
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <!-- Основной контейнер для карты -->
+    <div id="map"></div>
+
+    <!-- Верхняя панель (меню) -->
+    <div id="top-bar">
+        <button id="menu-btn">☰</button>
+        <span id="app-title">Цифровой штурман</span>
+        <div id="map-controls">
+            <button id="layers-btn" title="Стиль карты">🗺️</button>
+        </div>
+    </div>
+
+    <!-- Боковая панель (информация о маршруте) -->
+    <div id="side-panel">
+        <h3>Маршрут</h3>
+        <div id="route-info">Выберите точки на карте</div>
+    </div>
+
+    <!-- Нижняя панель (быстрый доступ) -->
+    <div id="bottom-bar">
+        <button class="bottom-btn" data-tab="route">🗺️ Маршрут</button>
+        <button class="bottom-btn" data-tab="boat">⛵ Лодка</button>
+        <button class="bottom-btn" data-tab="compare">📊 Сравнить</button>
+        <button class="bottom-btn" data-tab="log">📋 Журнал</button>
+    </div>
+
+    <!-- Правая боковая панель (инструменты) -->
+    <div id="right-tools">
+        <button id="tool-search" title="Поиск">🔍</button>
+        <button id="tool-measure" title="Измерить">📏</button>
+        <button id="tool-route" title="Построить маршрут">📍</button>
+    </div>
+
+    <!-- Подключаем скрипты -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="static/js/main.js"></script>
+</body>
+</html>
