@@ -7,7 +7,6 @@ const map = L.map('map', {
     zoomControl: false, // Отключаем стандартные контролы, т.к. используем свои
 });
 
-// --- Базовый слой (тёмный стиль, как ночной режим) ---
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB',
     subdomains: 'abcd',
@@ -26,15 +25,71 @@ const state = {
     markers: [],        // Массив для хранения маркеров
     routeLayer: null,   // Слой для отображения маршрута
     isRouteMode: false, // Режим построения маршрута
+    boatConfig: {
+        model: 'raptor650',
+        config: 'no',          // 'no' или 'yes'
+        load: 1.2,             // тонны
+        fuel: 300,             // литры
+        reserve: 20,           // процент
+    }
 };
 
 // --- DOM-элементы ---
-const sidePanel = document.getElementById('side-panel');
+const routePanel = document.getElementById('route-panel');
+const boatPanel = document.getElementById('boat-panel');
 const routeInfo = document.getElementById('route-info');
 const bottomBtns = document.querySelectorAll('.bottom-btn');
 const toolRouteBtn = document.getElementById('tool-route');
 
-// --- Функции для работы с картой ---
+// Элементы управления лодкой
+const boatModel = document.getElementById('boat-model');
+const configNo = document.getElementById('config-no');
+const configYes = document.getElementById('config-yes');
+const loadSlider = document.getElementById('load-slider');
+const loadValue = document.getElementById('load-value');
+const fuelSlider = document.getElementById('fuel-slider');
+const fuelValue = document.getElementById('fuel-value');
+const reserveSlider = document.getElementById('reserve-slider');
+const reserveValue = document.getElementById('reserve-value');
+const applyBoatBtn = document.getElementById('apply-boat-settings');
+const boatStatus = document.getElementById('boat-status');
+
+// --- Функции ---
+
+// Обновление отображения слайдеров
+function updateBoatUI() {
+    loadValue.textContent = state.boatConfig.load.toFixed(1);
+    fuelValue.textContent = state.boatConfig.fuel;
+    reserveValue.textContent = state.boatConfig.reserve;
+    // Синхронизируем элементы ввода
+    loadSlider.value = state.boatConfig.load;
+    fuelSlider.value = state.boatConfig.fuel;
+    reserveSlider.value = state.boatConfig.reserve;
+    if (state.boatConfig.config === 'yes') {
+        configYes.checked = true;
+    } else {
+        configNo.checked = true;
+    }
+    boatModel.value = state.boatConfig.model;
+    // Отображаем статус
+    const configLabel = state.boatConfig.config === 'yes' ? 'с поддувом' : 'без поддува';
+    boatStatus.textContent = `Конфигурация: ${configLabel}, загрузка: ${state.boatConfig.load} т, топливо: ${state.boatConfig.fuel} л, резерв: ${state.boatConfig.reserve}%`;
+}
+
+// Применение настроек лодки из формы
+function applyBoatSettings() {
+    state.boatConfig.model = boatModel.value;
+    state.boatConfig.config = configYes.checked ? 'yes' : 'no';
+    state.boatConfig.load = parseFloat(loadSlider.value);
+    state.boatConfig.fuel = parseInt(fuelSlider.value, 10);
+    state.boatConfig.reserve = parseInt(reserveSlider.value, 10);
+    updateBoatUI();
+    // Можно добавить уведомление
+    boatStatus.textContent += ' ✅ Применено';
+    setTimeout(() => {
+        boatStatus.textContent = boatStatus.textContent.replace(' ✅ Применено', '');
+    }, 2000);
+}
 
 // Функция добавления маркера
 function addMarker(lat, lng, label) {
@@ -55,7 +110,7 @@ function addMarker(lat, lng, label) {
     return marker;
 }
 
-// Функция отображения маршрута (полилинии)
+// Отображение маршрута
 function displayRoute(coordinates) {
     if (state.routeLayer) {
         map.removeLayer(state.routeLayer);
@@ -64,12 +119,11 @@ function displayRoute(coordinates) {
         color: '#6fc3ff',
         weight: 4,
         opacity: 0.9,
-        dashArray: null,
     }).addTo(map);
     map.fitBounds(state.routeLayer.getBounds(), { padding: [50, 50] });
 }
 
-// Функция обновления информации в боковой панели
+// Обновление информации о маршруте
 function updateRouteInfo(data) {
     if (!data) {
         routeInfo.innerHTML = 'Выберите точки на карте';
@@ -85,53 +139,52 @@ function updateRouteInfo(data) {
             ${data.description || 'Маршрут построен'}
         </div>
     `;
-    sidePanel.classList.remove('hidden');
 }
 
-// --- Обработчики событий ---
+// --- Обработчики ---
 
-// Клик по карте для выбора точек
+// Клик по карте
 map.on('click', function(e) {
+    if (!state.isRouteMode) return;
     const { lat, lng } = e.latlng;
 
-    if (state.isRouteMode) {
-        if (!state.startPoint) {
+    if (!state.startPoint) {
             // Устанавливаем начальную точку
-            state.startPoint = { lat, lng };
-            const marker = addMarker(lat, lng, 'A');
-            state.markers.push(marker);
-            routeInfo.innerHTML = 'Точка A выбрана. Выберите точку B.';
-        } else if (!state.endPoint) {
+        state.startPoint = { lat, lng };
+        const marker = addMarker(lat, lng, 'A');
+        state.markers.push(marker);
+        routeInfo.innerHTML = 'Точка A выбрана. Выберите точку B.';
+    } else if (!state.endPoint) {
             // Устанавливаем конечную точку
-            state.endPoint = { lat, lng };
-            const marker = addMarker(lat, lng, 'B');
-            state.markers.push(marker);
+        state.endPoint = { lat, lng };
+        const marker = addMarker(lat, lng, 'B');
+        state.markers.push(marker);
 
-            // Здесь будет запрос к вашему API для построения маршрута
-            // Пока имитируем ответ
-            const mockRoute = [
-                [state.startPoint.lat, state.startPoint.lng],
-                [(state.startPoint.lat + state.endPoint.lat) / 2, (state.startPoint.lng + state.endPoint.lng) / 2],
-                [state.endPoint.lat, state.endPoint.lng]
-            ];
-            displayRoute(mockRoute);
-            updateRouteInfo({
-                length: '42.5',
-                time: '68',
-                fuel: '34',
-                description: 'Маршрут построен в режиме "Быстрый"'
-            });
+        // Здесь будет запрос к API с параметрами лодки
+        // Пока имитация
+        const mockRoute = [
+            [state.startPoint.lat, state.startPoint.lng],
+            [(state.startPoint.lat + state.endPoint.lat) / 2, (state.startPoint.lng + state.endPoint.lng) / 2],
+            [state.endPoint.lat, state.endPoint.lng]
+        ];
+        displayRoute(mockRoute);
+        // Передаём текущие настройки лодки в запрос (в реальности они будут в теле)
+        console.log('Параметры лодки:', state.boatConfig);
+        updateRouteInfo({
+            length: '42.5',
+            time: '68',
+            fuel: '34',
+            description: `Маршрут построен в режиме "Быстрый" (${state.boatConfig.config === 'yes' ? 'с поддувом' : 'без поддува'})`
+        });
 
-            // Сбрасываем режим выбора
-            state.isRouteMode = false;
-            toolRouteBtn.style.color = '#b0c7e0';
-        }
+        state.isRouteMode = false;
+        toolRouteBtn.style.color = '#b0c7e0';
     }
 });
 
-// Кнопка "Построить маршрут" (📍)
+// Кнопка "Построить маршрут"
 toolRouteBtn.addEventListener('click', function() {
-    // Очищаем предыдущие точки и маршруты
+    // Очистка предыдущего
     state.markers.forEach(m => map.removeLayer(m));
     state.markers = [];
     if (state.routeLayer) {
@@ -143,49 +196,65 @@ toolRouteBtn.addEventListener('click', function() {
     state.isRouteMode = true;
     this.style.color = '#6fc3ff';
     routeInfo.innerHTML = 'Кликните на карте, чтобы выбрать точку A';
-    sidePanel.classList.remove('hidden');
+    // Показываем панель маршрута, если скрыта
+    routePanel.classList.remove('hidden');
+    boatPanel.classList.add('hidden');
+    // Обновляем активную кнопку внизу
+    bottomBtns.forEach(b => b.classList.remove('active'));
+    document.querySelector('.bottom-btn[data-tab="route"]').classList.add('active');
 });
 
-// Кнопки нижней панели
+// Нижняя панель – переключение вкладок
 bottomBtns.forEach(btn => {
     btn.addEventListener('click', function() {
         bottomBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         const tab = this.dataset.tab;
 
+        // Скрываем все панели
+        routePanel.classList.add('hidden');
+        boatPanel.classList.add('hidden');
+
         switch (tab) {
             case 'route':
-                // Показать/скрыть панель маршрута
-                sidePanel.classList.toggle('hidden');
+                routePanel.classList.remove('hidden');
                 break;
             case 'boat':
-                // Здесь будет модальное окно с настройками лодки
-                alert('Настройки лодки: Raptor 650, загрузка 1.2 т, поддув включён');
+                boatPanel.classList.remove('hidden');
+                updateBoatUI(); // обновляем актуальные значения
                 break;
             case 'compare':
-                // Здесь будет запрос на сравнение режимов
-                alert('Сравнение режимов: Быстрый, Экономичный, Безопасный');
+                alert('Сравнение режимов будет доступно после выбора маршрута.');
                 break;
             case 'log':
-                // Журнал маршрутов
                 alert('Журнал маршрутов (сохранённые треки)');
                 break;
         }
     });
 });
 
-// Кнопка "Стиль карты" (верхняя панель)
-document.getElementById('layers-btn').addEventListener('click', function() {
-    // Переключение между стилями карты (как в Savvy Navvy)
-    const currentUrl = map.getTileLayer().getContainer().querySelector('img').src;
-    // Здесь можно реализовать переключение слоёв
-    alert('Смена стиля карты: Обычный / Ночной / Спутник');
+// Обработчики слайдеров (обновление отображения)
+loadSlider.addEventListener('input', function() {
+    loadValue.textContent = parseFloat(this.value).toFixed(1);
+});
+fuelSlider.addEventListener('input', function() {
+    fuelValue.textContent = this.value;
+});
+reserveSlider.addEventListener('input', function() {
+    reserveValue.textContent = this.value;
 });
 
-// Кнопка "Меню" (верхняя панель)
+// Применение настроек лодки
+applyBoatBtn.addEventListener('click', applyBoatSettings);
+
+// Дополнительные кнопки
+document.getElementById('layers-btn').addEventListener('click', function() {
+    alert('Смена стиля карты: Обычный / Ночной / Спутник');
+});
 document.getElementById('menu-btn').addEventListener('click', function() {
     alert('Главное меню: Загрузка карты, Настройки, Офлайн-режим');
 });
 
 // --- Инициализация ---
-console.log('Цифровой штурман аэролодки готов к работе!');
+updateBoatUI();
+console.log('Цифровой штурман аэролодки готов!');

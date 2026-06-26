@@ -206,3 +206,111 @@ body {
             font-size: 16px;
         }
 }
+
+/* Общие стили для боковых панелей */
+.side-panel {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    width: 320px;
+    max-height: calc(100vh - 180px);
+    background: rgba(11, 26, 47, 0.92);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 20px;
+    overflow-y: auto;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+    .side-panel.hidden {
+        transform: translateX(120%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .side-panel h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #6fc3ff;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 10px;
+    }
+
+/* Стили для параметров лодки */
+.boat-param {
+    margin-bottom: 16px;
+}
+
+    .boat-param label {
+        display: block;
+        font-size: 14px;
+        color: #b0c7e0;
+        margin-bottom: 4px;
+    }
+
+    .boat-param input[type="range"] {
+        width: 100%;
+        background: transparent;
+        accent-color: #6fc3ff;
+    }
+
+    .boat-param select {
+        width: 100%;
+        padding: 8px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #e0e7f0;
+        font-size: 14px;
+    }
+
+    .boat-param .radio-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 4px;
+    }
+
+        .boat-param .radio-group label {
+            display: inline;
+            font-weight: normal;
+            color: #b0c7e0;
+        }
+
+        .boat-param .radio-group input[type="radio"] {
+            accent-color: #6fc3ff;
+        }
+
+.primary-btn {
+    background: #6fc3ff;
+    border: none;
+    color: #0b1a2f;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+}
+
+    .primary-btn:hover {
+        background: #5aafeb;
+    }
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .side-panel {
+        width: 280px;
+        right: 10px;
+        top: 70px;
+        padding: 15px;
+    }
+
+    .bottom-btn span {
+        display: none;
+    }
+}

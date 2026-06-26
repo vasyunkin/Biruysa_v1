@@ -22,28 +22,61 @@
         </div>
     </div>
 
-    <!-- Боковая панель (информация о маршруте) -->
-    <div id="side-panel">
-        <h3>Маршрут</h3>
+    <!-- Боковая панель: Маршрут -->
+    <div id="route-panel" class="side-panel">
+        <h3>📋 Маршрут</h3>
         <div id="route-info">Выберите точки на карте</div>
+    </div>
+
+    <!-- Боковая панель: Настройки лодки -->
+    <div id="boat-panel" class="side-panel hidden">
+        <h3>⛵ Настройки лодки</h3>
+        <div class="boat-param">
+            <label>Модель</label>
+            <select id="boat-model">
+                <option value="raptor650">Raptor 650</option>
+            </select>
+        </div>
+        <div class="boat-param">
+            <label>Конфигурация</label>
+            <div class="radio-group">
+                <input type="radio" id="config-no" name="config" value="no" checked>
+                <label for="config-no">Без поддува</label>
+                <input type="radio" id="config-yes" name="config" value="yes">
+                <label for="config-yes">С поддувом</label>
+            </div>
+        </div>
+        <div class="boat-param">
+            <label>Загрузка: <span id="load-value">1.2</span> т</label>
+            <input type="range" id="load-slider" min="0.5" max="1.5" step="0.1" value="1.2">
+        </div>
+        <div class="boat-param">
+            <label>Запас топлива: <span id="fuel-value">300</span> л</label>
+            <input type="range" id="fuel-slider" min="50" max="370" step="10" value="300">
+        </div>
+        <div class="boat-param">
+            <label>Резерв топлива: <span id="reserve-value">20</span>%</label>
+            <input type="range" id="reserve-slider" min="10" max="30" step="1" value="20">
+        </div>
+        <button id="apply-boat-settings" class="primary-btn">Применить</button>
+        <div id="boat-status" style="margin-top:10px; font-size:13px; color:#8899b0;"></div>
     </div>
 
     <!-- Нижняя панель (быстрый доступ) -->
     <div id="bottom-bar">
-        <button class="bottom-btn" data-tab="route">🗺️ Маршрут</button>
+        <button class="bottom-btn active" data-tab="route">🗺️ Маршрут</button>
         <button class="bottom-btn" data-tab="boat">⛵ Лодка</button>
         <button class="bottom-btn" data-tab="compare">📊 Сравнить</button>
         <button class="bottom-btn" data-tab="log">📋 Журнал</button>
     </div>
 
-    <!-- Правая боковая панель (инструменты) -->
+    <!-- Правая панель инструментов -->
     <div id="right-tools">
         <button id="tool-search" title="Поиск">🔍</button>
         <button id="tool-measure" title="Измерить">📏</button>
         <button id="tool-route" title="Построить маршрут">📍</button>
     </div>
 
-    <!-- Подключаем скрипты -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="static/js/main.js"></script>
 </body>
