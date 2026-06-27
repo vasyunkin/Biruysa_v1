@@ -174,25 +174,3 @@ def calculate_route(
         "air_blow_activation_count": air_blow_activated_segments,
         "warnings": list(set(warnings)),
     }
-
-
-# Демонстрация работы штурмана с динамическим поддувом
-if __name__ == "__main__":
-    try:
-        json_data = load_scenario_data("data.json")
-        start_pt = "Дивногорск"
-        finish_pt = "Бирюса"
-
-        print("=== ТЕСТ: ЛОДКА С ПОДДЕРЖКОЙ ПОДДУВА (ДИНАМИЧЕСКИЙ РЕЖИМ) ===")
-        for mode in ["кратчайший", "быстрый", "экономичный", "безопасный"]:
-            result = calculate_route(
-                json_data, start_pt, finish_pt, "с поддувом", mode
-            )
-            print(f"\nРежим '{mode.upper()}':")
-            print(f"Путь: {' -> '.join(result['path'])}")
-            print(f"Расход топлива: {result['total_fuel_liters']} л")
-            print(f"Включений поддува на участках: {result['air_blow_activation_count']}")
-            print(f"Предупреждения: {result['warnings']}")
-
-    except FileNotFoundError:
-        print("Ошибка: положите файл 'data.json' в одну папку со скриптом.")
