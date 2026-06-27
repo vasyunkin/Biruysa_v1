@@ -81,12 +81,18 @@
         <button id="tool-route" title="Построить маршрут">📍</button>
     </div>
 
-    <!-- Локальный JS Leaflet (ОБЯЗАТЕЛЬНО ПОДКЛЮЧАТЬ ДО main.js) -->
+    <!-- Leaflet -->
     <script src="static/libs/leaflet/leaflet.js"></script>
 
-    <!--<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>-->
+    <!-- DOM-элементы (должны быть доступны во всех остальных скриптах) -->
+    <script src="static/js/dom.js"></script>
 
-    <!-- Ваш скрипт -->
+    <!-- Остальные модули -->
+    <script src="static/js/config.js"></script>
+    <script src="static/js/map-init.js"></script>
+    <script src="static/js/boat.js"></script>
+    <script src="static/js/ui.js"></script>
+    <script src="static/js/route.js"></script>
     <script src="static/js/main.js"></script>
 </body>
 </html>
