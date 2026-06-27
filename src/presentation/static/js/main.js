@@ -7,6 +7,7 @@ const map = L.map('map', {
     zoomControl: false, // Отключаем стандартные контролы, т.к. используем свои
 });
 
+// TODO: Это не локально! Локализовать!
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB',
     subdomains: 'abcd',

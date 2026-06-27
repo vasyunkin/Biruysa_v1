@@ -6,6 +6,8 @@
     <title>Цифровой штурман аэролодки</title>
     <!-- Подключаем стили Leaflet -->
     <!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />-->
+    <!-- Локальный CSS Leaflet -->
+    <link rel="stylesheet" href="static/libs/leaflet/leaflet.css">
     <!-- Подключаем пользовательские стили -->
     <link rel="stylesheet" href="static/css/base.css">
     <link rel="stylesheet" href="static/css/layout.css">
@@ -79,7 +81,12 @@
         <button id="tool-route" title="Построить маршрут">📍</button>
     </div>
 
+    <!-- Локальный JS Leaflet (ОБЯЗАТЕЛЬНО ПОДКЛЮЧАТЬ ДО main.js) -->
+    <script src="static/libs/leaflet/leaflet.js"></script>
+
     <!--<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>-->
+
+    <!-- Ваш скрипт -->
     <script src="static/js/main.js"></script>
 </body>
 </html>
