@@ -1,7 +1,5 @@
 // static/js/ui.js
 
-// Все DOM-элементы теперь в dom.js – используем глобальные переменные
-
 // --- Нижняя панель – переключение вкладок ---
 bottomBtns.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -12,6 +10,7 @@ bottomBtns.forEach(btn => {
         // Скрываем все панели
         routePanel.classList.add('hidden');
         boatPanel.classList.add('hidden');
+        comparisonSection.classList.add('hidden');
 
         switch (tab) {
             case 'route':
@@ -24,7 +23,11 @@ bottomBtns.forEach(btn => {
                 }
                 break;
             case 'compare':
-                alert('Сравнение режимов будет доступно после выбора маршрута.');
+                // Показываем таблицу сравнения с текущими настройками лодки
+                if (typeof updateComparisonTable === 'function') {
+                    updateComparisonTable();
+                }
+                comparisonSection.classList.remove('hidden');
                 break;
             case 'log':
                 alert('Журнал маршрутов (сохранённые треки)');

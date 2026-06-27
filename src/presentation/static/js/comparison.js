@@ -2,17 +2,11 @@
 
 // --- Вспомогательные функции расчёта (mock) ---
 
-/**
- * Рассчитывает параметры маршрута для заданного режима и конфигурации лодки.
- * Здесь мы имитируем логику, которая позже будет заменена на реальные запросы к бэкенду.
- */
 function calculateRoute(mode, boatConfig) {
-    // Базовые параметры (заглушка)
-    const baseTime = 60; // минут
-    const baseFuel = 30; // литров
-    const obstacles = ['болото', 'камни', 'трава']; // все возможные препятствия
+    const baseTime = 60;
+    const baseFuel = 30;
+    const obstacles = ['болото', 'камни', 'трава'];
 
-    // Коэффициенты для разных режимов
     const modeFactors = {
         'быстрый': { time: 0.8, fuel: 1.2, risk: 1.0 },
         'экономичный': { time: 1.3, fuel: 0.7, risk: 1.1 },
@@ -20,30 +14,22 @@ function calculateRoute(mode, boatConfig) {
         'безопасный': { time: 1.4, fuel: 1.1, risk: 0.6 }
     };
 
-    // Влияние поддува
     const configFactor = boatConfig.config === 'yes' ? 0.9 : 1.0;
-    // Влияние загрузки (чем больше вес, тем выше расход и время)
-    const loadFactor = 1 + (boatConfig.load - 0.5) * 0.3; // от 0.5 до 1.5 -> фактор от 1.0 до 1.3
+    const loadFactor = 1 + (boatConfig.load - 0.5) * 0.3;
 
     const factor = modeFactors[mode] || modeFactors['быстрый'];
 
-    // Рассчитываем время, расход
     const time = Math.round(baseTime * factor.time * loadFactor * configFactor);
     const fuel = Math.round(baseFuel * factor.fuel * loadFactor * configFactor * 10) / 10;
 
-    // Препятствия: для разных режимов некоторые препятствия могут быть исключены
     let activeObstacles = [...obstacles];
     if (mode === 'безопасный') {
-        // безопасный режим обходит болота и камни
         activeObstacles = activeObstacles.filter(o => o !== 'болото' && o !== 'камни');
     }
     if (boatConfig.config === 'yes') {
-        // с поддувом можно проходить по камням и болоту
-        // но всё равно могут остаться травяные участки
         activeObstacles = activeObstacles.filter(o => o !== 'камни' && o !== 'болото');
     }
 
-    // Последствия – оцениваем риск
     let consequence = '✅ Рекомендуется';
     let consequenceClass = 'consequence-ok';
     if (mode === 'быстрый' && fuel > 35) {
@@ -63,18 +49,11 @@ function calculateRoute(mode, boatConfig) {
         consequenceClass = 'consequence-danger';
     }
 
-    return {
-        time,
-        fuel,
-        obstacles: activeObstacles,
-        consequence,
-        consequenceClass
-    };
+    return { time, fuel, obstacles: activeObstacles, consequence, consequenceClass };
 }
 
-/**
- * Генерирует и отображает таблицу сравнения.
- */
+// --- Генерация таблицы ---
+
 function renderComparisonTable(boatConfig) {
     const modes = ['быстрый', 'экономичный', 'кратчайший', 'безопасный'];
     const configLabel = boatConfig.config === 'yes' ? 'с поддувом' : 'без поддува';
@@ -98,7 +77,7 @@ function renderComparisonTable(boatConfig) {
             ? data.obstacles.map(o => `<span class="obstacle-tag">${o}</span>`).join(' ')
             : '—';
         html += `
-            <tr>
+            <tr data-mode="${mode}" style="cursor:pointer;">
                 <td><strong>${mode}</strong></td>
                 <td>${data.time}</td>
                 <td>${obstacleTags}</td>
@@ -111,42 +90,71 @@ function renderComparisonTable(boatConfig) {
 
     html += `</tbody></table>`;
     comparisonTableContainer.innerHTML = html;
+
+    // --- Обработчики клика на строки ---
+    document.querySelectorAll('.comparison-table tbody tr').forEach(row => {
+        row.addEventListener('click', function() {
+            const mode = this.dataset.mode;
+            const boatConfig = state.boatConfig;
+            const routeData = calculateRoute(mode, boatConfig);
+
+            // Формируем полный объект для отображения
+            const fullRoute = {
+                mode: mode,
+                length: '42.5', // mock – позже заменим на реальные данные
+                time: routeData.time,
+                fuel: routeData.fuel,
+                config: boatConfig.config === 'yes' ? 'с поддувом' : 'без поддува',
+                obstacles: routeData.obstacles,
+                consequence: routeData.consequence,
+                consequenceColor: routeData.consequenceClass === 'consequence-ok' ? '#4caf50' : (routeData.consequenceClass === 'consequence-warn' ? '#ff9800' : '#f44336'),
+                remainder: (boatConfig.fuel - routeData.fuel).toFixed(1),
+                range: ((boatConfig.fuel - routeData.fuel) / (routeData.fuel / 42.5)).toFixed(1)
+            };
+
+            // Mock-координаты маршрута (позже заменим на реальные)
+            const mockCoords = [
+                [56.0, 93.0],
+                [56.05, 93.1],
+                [56.1, 93.2]
+            ];
+
+            // Отображаем маршрут на карте
+            displayRoute(mockCoords);
+            // Обновляем панель маршрута
+            updateRouteInfo(fullRoute);
+
+            // Переключаем интерфейс: скрываем сравнение, показываем маршрут
+            comparisonSection.classList.add('hidden');
+            routePanel.classList.remove('hidden');
+            boatPanel.classList.add('hidden');
+            bottomBtns.forEach(b => b.classList.remove('active'));
+            document.querySelector('.bottom-btn[data-tab="route"]').classList.add('active');
+        });
+    });
 }
 
-/**
- * Обновляет таблицу при изменении веса груза (или при применении настроек).
- */
+// --- Обновление таблицы (вызывается при изменении веса груза или после "Применить") ---
+
 function updateComparisonTable() {
-    // Берём текущие настройки лодки из глобального состояния
     const boatConfig = state.boatConfig;
-    // Обновляем значение слайдера и отображение веса
     comparisonLoadSlider.value = boatConfig.load;
     comparisonLoadValue.textContent = boatConfig.load.toFixed(1);
-    // Рендерим таблицу
     renderComparisonTable(boatConfig);
-    // Показываем секцию сравнения, если она скрыта
     comparisonSection.classList.remove('hidden');
 }
 
 // --- Обработчики событий ---
 
-// Слайдер веса под таблицей
 comparisonLoadSlider.addEventListener('input', function() {
     const newLoad = parseFloat(this.value);
     comparisonLoadValue.textContent = newLoad.toFixed(1);
-    // Обновляем состояние лодки (чтобы расчёты использовали новый вес)
     state.boatConfig.load = newLoad;
-    // Перерисовываем таблицу
     renderComparisonTable(state.boatConfig);
 });
 
-// Кнопка закрытия таблицы
 closeComparisonBtn.addEventListener('click', function() {
     comparisonSection.classList.add('hidden');
 });
 
-// (Опционально) Если нужно, чтобы при повторном нажатии "Применить" таблица обновлялась,
-// она будет вызываться из boat.js, как мы добавили ранее.
-
-// Инициализация: при загрузке показываем таблицу, если есть сохранённые данные?
-// По умолчанию таблица скрыта, показываем только после применения.
+// (Вызов updateComparisonTable из boat.js уже добавлен ранее)

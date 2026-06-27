@@ -54,21 +54,36 @@ function displayRoute(coordinates) {
     map.fitBounds(state.routeLayer.getBounds(), { padding: [50, 50] });
 }
 
-// Обновление информации о маршруте
+// Обновление информации о маршруте (расширенная версия)
 function updateRouteInfo(data) {
-    const routeInfo = document.getElementById('route-info');
     if (!data) {
         routeInfo.innerHTML = 'Выберите точки на карте';
         return;
     }
-    routeInfo.innerHTML = `
-        <div style="margin-bottom: 12px;">
-            <strong>Длина:</strong> ${data.length || '—'} км<br>
-            <strong>Время:</strong> ${data.time || '—'} мин<br>
-            <strong>Расход топлива:</strong> ${data.fuel || '—'} л
-        </div>
-        <div style="font-size: 13px; color: #8899b0;">
-            ${data.description || 'Маршрут построен'}
-        </div>
-    `;
+    // Если передан объект с полными деталями (режим, конфигурация и т.д.)
+    if (data.mode) {
+        routeInfo.innerHTML = `
+            <div style="margin-bottom: 8px;"><strong>Режим:</strong> ${data.mode}</div>
+            <div style="margin-bottom: 8px;"><strong>Длина:</strong> ${data.length || '—'} км</div>
+            <div style="margin-bottom: 8px;"><strong>Время:</strong> ${data.time || '—'} мин</div>
+            <div style="margin-bottom: 8px;"><strong>Расход топлива:</strong> ${data.fuel || '—'} л</div>
+            <div style="margin-bottom: 8px;"><strong>Конфигурация:</strong> ${data.config || '—'}</div>
+            <div style="margin-bottom: 8px;"><strong>Препятствия:</strong> ${data.obstacles ? data.obstacles.join(', ') : '—'}</div>
+            <div style="margin-bottom: 8px;"><strong>Последствия:</strong> <span style="color: ${data.consequenceColor || 'inherit'}">${data.consequence || '—'}</span></div>
+            <div style="margin-bottom: 8px;"><strong>Остаток топлива:</strong> ${data.remainder || '—'} л</div>
+            <div style="margin-bottom: 8px;"><strong>Запас хода:</strong> ${data.range || '—'} км</div>
+        `;
+    } else {
+        // Старый формат (для mock-клика по карте)
+        routeInfo.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <strong>Длина:</strong> ${data.length || '—'} км<br>
+                <strong>Время:</strong> ${data.time || '—'} мин<br>
+                <strong>Расход топлива:</strong> ${data.fuel || '—'} л
+            </div>
+            <div style="font-size: 13px; color: #8899b0;">
+                ${data.description || 'Маршрут построен'}
+            </div>
+        `;
+    }
 }
