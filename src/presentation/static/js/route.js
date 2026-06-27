@@ -39,6 +39,10 @@ async function fetchRouteData() {
 
         const data = await response.json();
         state.calculatedModes = data.modes; // Сохраняем расчеты всех 4-х режимов
+        // Если панель сравнения открыта, обновить таблицу
+        if (!comparisonSection.classList.contains('hidden')) {
+            renderComparisonTable(state.boatConfig);
+        }
 
         // Рендерим активный в данный момент режим на вкладке
         renderActiveModeRoute();
@@ -64,14 +68,32 @@ function renderActiveModeRoute() {
         return;
     }
 
+    // Проверяем наличие пути и корректность координат
+    if (!routeData.path || !Array.isArray(routeData.path) || routeData.path.length < 2) {
+        routeSummary.innerHTML = `<b style="color:#e74c3c;">Ошибка: путь для режима "${state.activeMode}" не содержит достаточно точек.</b>`;
+        return;
+    }
+
     // 2. Строим визуальную линию пути по координатам вершин из config.js
-    const coordinates = routeData.path.map(nodeName => GRAPH_NODES[nodeName]);
+    const coordinates = routeData.path.map(nodeName => {
+        const coord = GRAPH_NODES[nodeName];
+        if (!coord) {
+            console.warn(`Вершина "${nodeName}" не найдена в GRAPH_NODES для режима "${state.activeMode}"`);
+        }
+        return coord;
+    }).filter(coord => coord !== undefined); // фильтруем undefined
+
+    // Если после фильтрации осталось меньше 2 точек — ошибка
+    if (coordinates.length < 2) {
+        routeSummary.innerHTML = `<b style="color:#e74c3c;">Ошибка: не удалось построить путь для режима "${state.activeMode}". Проверьте данные.</b>`;
+        return;
+    }
 
     const polyline = L.polyline(coordinates, {
         color: '#6fc3ff',
         weight: 5,
         opacity: 0.85,
-        dashArray: state.activeMode === 'экономичный' ? '8, 8' : null // Выделяем эконом-режим пунктиром
+        dashArray: state.activeMode === 'экономичный' ? '8, 8' : null
     }).addTo(map);
 
     state.routeLayers.push(polyline);
