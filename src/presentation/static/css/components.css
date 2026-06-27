@@ -1,4 +1,4 @@
-
+/* ===== Bottom Buttons ===== */
 .bottom-btn {
     background: none;
     border: none;
@@ -15,47 +15,13 @@
 }
 
     .bottom-btn:hover {
-        background: rgba(111,195,255,0.15);
+        background: rgba(111, 195, 255, 0.15);
         color: var(--accent);
     }
 
     .bottom-btn.active {
-        background: rgba(111,195,255,0.2);
+        background: rgba(111, 195, 255, 0.2);
         color: var(--accent);
-    }
-
-/* ===== Side Panels (универсальный класс) ===== */
-.side-panel {
-    position: absolute;
-    top: 80px;
-    right: 20px;
-    z-index: 1000;
-    width: 320px;
-    max-height: calc(100vh - 180px);
-    background: var(--bg-glass);
-    backdrop-filter: blur(12px);
-    border-radius: 16px;
-    border: 1px solid var(--border-glass);
-    padding: 20px;
-    overflow-y: auto;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: translateX(0);
-    opacity: 1;
-}
-
-    .side-panel.hidden {
-        transform: translateX(120%);
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .side-panel h3 {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--accent);
-        margin-bottom: 15px;
-        border-bottom: 1px solid var(--border-glass);
-        padding-bottom: 10px;
     }
 
 /* ===== Boat Settings ===== */
@@ -80,33 +46,37 @@
         width: 100%;
         padding: 8px;
         border-radius: 8px;
-        background: rgba(255,255,255,0.05);
+        background: rgba(0, 0, 0, 0.03);
         border: 1px solid var(--border-glass);
         color: var(--text-primary);
         font-size: 14px;
     }
 
-    .boat-param .radio-group {
-        display: flex;
-        gap: 15px;
-        margin-top: 4px;
+.dark-theme .boat-param select {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.boat-param .radio-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 4px;
+}
+
+    .boat-param .radio-group label {
+        display: inline;
+        font-weight: normal;
+        color: var(--text-secondary);
     }
 
-        .boat-param .radio-group label {
-            display: inline;
-            font-weight: normal;
-            color: var(--text-secondary);
-        }
-
-        .boat-param .radio-group input[type="radio"] {
-            accent-color: var(--accent);
-        }
+    .boat-param .radio-group input[type="radio"] {
+        accent-color: var(--accent);
+    }
 
 /* ===== Buttons ===== */
 .primary-btn {
     background: var(--accent);
     border: none;
-    color: var(--bg-primary);
+    color: #fff;
     padding: 10px 20px;
     border-radius: 8px;
     font-weight: 600;
@@ -129,3 +99,14 @@
     #route-info strong {
         color: var(--text-primary);
     }
+
+/* ===== Boat Status ===== */
+#boat-status {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: color var(--transition);
+}
+
+/* ===== Дополнительные элементы (если нужны) ===== */
+/* Можно добавить стили для маркеров карты, но они обычно задаются через Leaflet */

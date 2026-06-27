@@ -11,9 +11,10 @@
     background: var(--bg-glass-light);
     backdrop-filter: blur(10px);
     padding: 10px 20px;
-    border-radius: 12px;
+    border-radius: var(--radius);
     border: 1px solid var(--border-glass);
     box-shadow: var(--shadow);
+    transition: background var(--transition), border var(--transition), box-shadow var(--transition);
 }
 
 #app-title {
@@ -31,13 +32,18 @@
     cursor: pointer;
     padding: 5px 10px;
     border-radius: 8px;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
     #top-bar button:hover {
-        background: rgba(255,255,255,0.1);
-        color: #fff;
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--text-primary);
     }
+
+.dark-theme #top-bar button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
 
 /* ===== Bottom Bar ===== */
 #bottom-bar {
@@ -48,12 +54,13 @@
     z-index: 1000;
     display: flex;
     gap: 8px;
-    background: rgba(11, 26, 47, 0.9);
+    background: var(--bg-glass);
     backdrop-filter: blur(12px);
     padding: 8px 16px;
     border-radius: 30px;
     border: 1px solid var(--border-glass);
-    box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+    box-shadow: var(--shadow-bottom);
+    transition: background var(--transition), border var(--transition), box-shadow var(--transition);
 }
 
 /* ===== Right Tools ===== */
@@ -71,9 +78,9 @@
     #right-tools button {
         width: 44px;
         height: 44px;
-        border-radius: 12px;
+        border-radius: var(--radius);
         border: 1px solid var(--border-glass);
-        background: rgba(11, 26, 47, 0.8);
+        background: var(--bg-glass);
         backdrop-filter: blur(8px);
         color: var(--text-secondary);
         font-size: 18px;
@@ -85,12 +92,12 @@
     }
 
         #right-tools button:hover {
-            background: rgba(111,195,255,0.2);
-            border-color: rgba(111,195,255,0.3);
-            color: #fff;
+            background: rgba(111, 195, 255, 0.2);
+            border-color: rgba(111, 195, 255, 0.3);
+            color: var(--text-primary);
         }
 
-/* ===== Side Panels (универсальный класс) ===== */
+/* ===== Side Panels ===== */
 .side-panel {
     position: absolute;
     top: 80px;
@@ -98,15 +105,16 @@
     z-index: 1000;
     width: 320px;
     max-height: calc(100vh - 180px);
-    background: var(--bg-glass);
+    background: var(--bg-panel);
     backdrop-filter: blur(12px);
     border-radius: 16px;
     border: 1px solid var(--border-glass);
     padding: 20px;
     overflow-y: auto;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform var(--transition), opacity var(--transition), background var(--transition), border var(--transition);
     transform: translateX(0);
     opacity: 1;
+    box-shadow: var(--shadow);
 }
 
     .side-panel.hidden {
