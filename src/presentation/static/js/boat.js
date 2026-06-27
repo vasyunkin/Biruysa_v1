@@ -37,6 +37,10 @@ function applyBoatSettings() {
     setTimeout(() => {
         boatStatus.textContent = boatStatus.textContent.replace(' ✅ Применено', '');
     }, 2000);
+    // После применения настроек обновляем таблицу сравнения, если она видна
+    if (typeof updateComparisonTable === 'function') {
+        updateComparisonTable();
+    }
 }
 
 // --- Обработчики слайдеров (обновление отображения) ---

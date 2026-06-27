@@ -108,5 +108,65 @@
     transition: color var(--transition);
 }
 
-/* ===== Дополнительные элементы (если нужны) ===== */
-/* Можно добавить стили для маркеров карты, но они обычно задаются через Leaflet */
+/* ===== Comparison Table ===== */
+#comparison-section {
+    width: 700px;
+    max-width: 90vw;
+}
+
+#comparison-table-container {
+    overflow-x: auto;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+    .comparison-table th {
+        background: var(--accent);
+        color: #fff;
+        padding: 8px 12px;
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .comparison-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border-glass);
+        color: var(--text-secondary);
+    }
+
+    .comparison-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .comparison-table .highlight {
+        background: rgba(111, 195, 255, 0.1);
+    }
+
+    .comparison-table .consequence-ok {
+        color: #4caf50;
+    }
+
+    .comparison-table .consequence-warn {
+        color: #ff9800;
+    }
+
+    .comparison-table .consequence-danger {
+        color: #f44336;
+    }
+
+    .comparison-table .obstacle-tag {
+        display: inline-block;
+        background: rgba(0,0,0,0.05);
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin: 2px 4px 2px 0;
+        font-size: 12px;
+    }
+
+.dark-theme .comparison-table .obstacle-tag {
+    background: rgba(255,255,255,0.1);
+}

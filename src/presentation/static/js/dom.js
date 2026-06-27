@@ -30,4 +30,9 @@ const boatStatus = document.getElementById('boat-status');
 const layersBtn = document.getElementById('layers-btn');
 const menuBtn = document.getElementById('menu-btn');
 
-// --- При необходимости можно добавить другие элементы ---
+// Элементы сравнения
+const comparisonSection = document.getElementById('comparison-section');
+const comparisonTableContainer = document.getElementById('comparison-table-container');
+const comparisonLoadSlider = document.getElementById('comparison-load-slider');
+const comparisonLoadValue = document.getElementById('comparison-load-value');
+const closeComparisonBtn = document.getElementById('close-comparison');

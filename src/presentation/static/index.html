@@ -26,14 +26,14 @@
         </div>
     </div>
 
-    <!-- Боковая панель: Маршрут -->
-    <div id="route-panel" class="side-panel">
+    <!-- Боковая панель: Маршрут (скрыта по умолчанию) -->
+    <div id="route-panel" class="side-panel hidden">
         <h3>📋 Маршрут</h3>
         <div id="route-info">Выберите точки на карте</div>
     </div>
 
     <!-- Боковая панель: Настройки лодки -->
-    <div id="boat-panel" class="side-panel hidden">
+    <div id="boat-panel" class="side-panel">
         <h3>⛵ Настройки лодки</h3>
         <div class="boat-param">
             <label>Модель</label>
@@ -66,11 +66,24 @@
         <div id="boat-status" style="margin-top:10px; font-size:13px; color:#8899b0;"></div>
     </div>
 
+    <!-- Блок сравнения (появляется после нажатия "Применить") -->
+    <div id="comparison-section" class="side-panel hidden" style="width: 700px; right: auto; left: 50%; transform: translateX(-50%); top: 80px; max-height: 80vh; overflow-y: auto;">
+        <h3>📊 Сравнение режимов</h3>
+        <div id="comparison-table-container">
+            <!-- Таблица будет генерироваться JS -->
+        </div>
+        <div class="boat-param" style="margin-top: 15px; border-top: 1px solid var(--border-glass); padding-top: 15px;">
+            <label>Вес груза: <span id="comparison-load-value">1.2</span> т</label>
+            <input type="range" id="comparison-load-slider" min="0.5" max="1.5" step="0.1" value="1.2">
+        </div>
+        <button id="close-comparison" class="primary-btn" style="margin-top: 10px;">Закрыть</button>
+    </div>
+
     <!-- Нижняя панель (быстрый доступ) -->
     <div id="bottom-bar">
-        <button class="bottom-btn active" data-tab="route">🗺️ Маршрут</button>
-        <button class="bottom-btn" data-tab="boat">⛵ Лодка</button>
-        <button class="bottom-btn" data-tab="compare">📊 Сравнить</button>
+        <button class="bottom-btn active" data-tab="boat">⛵ Лодка</button>
+        <button class="bottom-btn" data-tab="route">🗺️ Маршрут</button>
+        <button class="bottom-btn" data-tab="compare">📊 Сравнение режимов</button>
         <button class="bottom-btn" data-tab="log">📋 Журнал</button>
     </div>
 
@@ -94,6 +107,7 @@
     <script src="static/js/map-init.js"></script>
     <!--<script src="static/js/attribution.js"></script>--> <!-- Добавляем сюда -->
     <script src="static/js/boat.js"></script>
+    <script src="static/js/comparison.js"></script>   <!-- Новый файл -->
     <script src="static/js/ui.js"></script>
     <script src="static/js/route.js"></script>
     <script src="static/js/main.js"></script>
