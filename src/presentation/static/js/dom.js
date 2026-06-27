@@ -36,6 +36,6 @@ const menuBtn = document.getElementById('menu-btn');
 // Элементы сравнения
 const comparisonSection = document.getElementById('comparison-section');
 const comparisonTableContainer = document.getElementById('comparison-table-container');
-// const comparisonLoadSlider = document.getElementById('comparison-load-slider');
-// const comparisonLoadValue = document.getElementById('comparison-load-value');
+const comparisonLoadSlider = document.getElementById('comparison-load-slider');
+const comparisonLoadValue = document.getElementById('comparison-load-value');
 const closeComparisonBtn = document.getElementById('close-comparison');
