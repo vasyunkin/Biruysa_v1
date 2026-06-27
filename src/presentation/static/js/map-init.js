@@ -5,12 +5,12 @@ const map = L.map('map', {
     center: [56.0, 93.0],
     zoom: 10,
     zoomControl: false,
-    // attributionControl включён по умолчанию, ничего не пишем
+    attributionControl: false, // Отключаем атрибуцию полностью
 });
 
-// Светлый тайловый слой (CartoDB Light) с полной атрибуцией
+// Светлый тайловый слой (без атрибуции)
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; CartoDB',
+    attribution: '', // Пустая строка, чтобы не было надписи
     subdomains: 'abcd',
     maxZoom: 19,
 }).addTo(map);
