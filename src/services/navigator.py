@@ -1,42 +1,22 @@
 import heapq
-import json
 from typing import Any, Dict, List, Optional
 
 
-def load_scenario_data(file_path: str = "data.json") -> Dict[str, Any]:
-    """Загружает конфигурационный файл ТЗ в формате JSON."""
-    with open(file_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def calculate_route(
-    data: Dict[str, Any],
-    start: str,
-    finish: str,
-    config_name: str,
-    mode_name: str,
+def _run_dijkstra(
+        data: Dict[str, Any],
+        start: str,
+        finish: str,
+        has_air_blow: bool,
+        mode_name: str,
 ) -> Optional[Dict[str, Any]]:
-    """Универсальная функция построения оптимального маршрута методом Дейкстры.
-
-    Поддерживает динамическое переключение поддува на жестких участках пути
-    для конфигураций лодки, поддерживающих эту опцию.
-    """
+    """Внутренняя изолированная функция Дейкстры для одного конкретного режима."""
     boat_cfg = data["boat"]
-    selected_config = data["configs"].get(config_name)
-    selected_mode = data["modes"].get(mode_name)
+    selected_mode = data["modes"][mode_name]
 
-    if not selected_config or not selected_mode:
-        raise ValueError(
-            f"Некорректная конфигурация лодки ({config_name}) "
-            f"или режим движения ({mode_name})."
-        )
-
-    # Модификация: allow_hard теперь означает принципиальное наличие поддува у лодки
-    has_air_blow = selected_config["allow_hard"]
     k_mode = selected_mode["k_mode"]
     base_fuel = boat_cfg["base_l_per_km"]
 
-    # 1. Построение списков смежности графа
+    # 1. Построение списков смежности графа с учетом проходимости лодки
     adj_list: Dict[str, List[tuple]] = {}
     for edge in data["map"]["edges"]:
         u, v = edge["from"], edge["to"]
@@ -44,7 +24,7 @@ def calculate_route(
         surf_type = edge["surface"]
         surf_info = data["surfaces"][surf_type]
 
-        # Если участок жесткий, а у лодки в принципе нет поддува — ребро непроходимо
+        # Если участок жесткий, а у лодки физически нет поддува — ребро непроходимо
         if surf_info["hard"] and not has_air_blow:
             continue
 
@@ -64,7 +44,7 @@ def calculate_route(
     min_costs = {start: 0.0}
     parent_edges = {start: None}
 
-    # 3. Основной цикл Дейкстры
+    # 3. Основной цикл обхода
     while queue:
         current_cost, u = heapq.heappop(queue)
 
@@ -75,22 +55,20 @@ def calculate_route(
             break
 
         for v, km, surf_type, surf_info in adj_list.get(u, []):
-            # ДИНАМИЧЕСКИЙ РАСЧЕТ k_load:
-            # Если поверхность жесткая, включаем поддув (k_load = 1.12 из конфига "с поддувом")
-            # Если гладкая — отключаем поддув ради экономии (k_load = 1.0 из конфига "без поддува")
+            # Динамический расчет k_load для текущего ребра
             if surf_info["hard"]:
                 current_k_load = data["configs"]["с поддувом"]["k_load"]
             else:
                 current_k_load = data["configs"]["без поддува"]["k_load"]
 
-            # Вычисление стоимости ребра в зависимости от выбранного режима
+            # Вычисление веса (стоимости) ребра под выбранный критерий
             if mode_name == "кратчайший":
                 edge_weight = km
             elif mode_name == "быстрый":
                 edge_weight = km / surf_info["spd"]
             elif mode_name == "экономичный":
                 edge_weight = (
-                    km * base_fuel * surf_info["k_surf"] * current_k_load * k_mode
+                        km * base_fuel * surf_info["k_surf"] * current_k_load * k_mode
                 )
             elif mode_name == "безопасный":
                 edge_weight = km * surf_info["risk"]
@@ -107,8 +85,18 @@ def calculate_route(
     if finish not in min_costs:
         return None
 
-    # 4. Восстановление пути и сбор параметров
+    # 4. Восстановление пути от финиша к старту
     curr = finish
+    segments_reversed = []
+    while parent_edges[curr] is not None:
+        prev, km, surf_type, surf_info = parent_edges[curr]
+        segments_reversed.append((prev, curr, km, surf_type, surf_info))
+        curr = prev
+
+    # Формируем массив вершин в правильном порядке
+    path = [start] + [seg[1] for seg in reversed(segments_reversed)]
+
+    # 5. Сбор сквозных физических метрик по найденному пути
     total_km = 0.0
     total_time = 0.0
     total_fuel = 0.0
@@ -116,20 +104,10 @@ def calculate_route(
     air_blow_activated_segments = 0
     warnings = []
 
-    segments_reversed = []
-    while parent_edges[curr] is not None:
-        prev, km, surf_type, surf_info = parent_edges[curr]
-        segments_reversed.append((prev, curr, km, surf_type, surf_info))
-        curr = prev
-
-    path = [start] + [seg[1] for seg in reversed(segments_reversed)]
-
-    # 5. Сквозной расчет параметров для финальной карточки
     for prev, curr, km, surf_type, surf_info in reversed(segments_reversed):
         total_km += km
         total_time += km / surf_info["spd"]
 
-        # Повторяем логику динамического поддува для точного расчета агрегированного топлива
         if surf_info["hard"]:
             current_k_load = data["configs"]["с поддувом"]["k_load"]
             air_blow_activated_segments += 1
@@ -159,18 +137,63 @@ def calculate_route(
         warnings.append("ВНИМАНИЕ: Недостаточно топлива для завершения маршрута!")
     elif remainder_fuel < reserve_limit:
         warnings.append(
-            f"Предупреждение: Остаток топлива ниже резерва ({reserve_limit} л)."
+            f"Предупреждение: Остаток топлива ниже резерва ({reserve_limit:.1f} л)."
         )
 
+    # Строгое округление согласно регламенту Кубка Енисея
     return {
-        "mode_used": mode_name,
-        "boat_type_configured": config_name,
+        "route_str": " → ".join(path),
         "path": path,
         "total_km": round(total_km, 1),
-        "total_time_hours": round(total_time, 2),
-        "total_fuel_liters": round(total_fuel, 1),
-        "remainder_fuel_liters": round(max(0.0, remainder_fuel), 1),
-        "max_route_risk": max_route_risk,
-        "air_blow_activation_count": air_blow_activated_segments,
+        "time_h": round(total_time, 2),
+        "fuel_l": round(total_fuel, 1),
+        "remainder_l": round(max(0.0, remainder_fuel), 1),
+        "max_risk": int(max_route_risk),
+        "air_blow_count": air_blow_activated_segments,
         "warnings": list(set(warnings)),
+    }
+
+
+def calculate_all_modes(
+        data: Dict[str, Any],
+        start: str,
+        finish: str,
+        config_name: str,
+) -> Dict[str, Any]:
+    """Публичная функция штурмана.
+
+    Рассчитывает сразу 4 оптимальных маршрута (по одному на каждый режим)
+    для заданной конфигурации лодки ('без поддува' или 'с поддувом').
+    """
+    selected_config = data["configs"].get(config_name)
+    if not selected_config:
+        raise ValueError(f"Некорректная конфигурация лодки: {config_name}")
+
+    has_air_blow = selected_config["allow_hard"]
+    modes_to_calculate = ["быстрый", "экономичный", "кратчайший", "безопасный"]
+
+    routes_output = {}
+
+    for mode in modes_to_calculate:
+        route_result = _run_dijkstra(data, start, finish, has_air_blow, mode)
+        # Если путь между точками принципиально не найден (например, изолирован)
+        if route_result is None:
+            routes_output[mode] = {
+                "error": "Маршрут недоступен для текущей конфигурации лодки",
+                "path": [],
+                "total_km": 0.0,
+                "time_h": 0.0,
+                "fuel_l": 0.0,
+                "remainder_l": 0.0,
+                "max_risk": 0,
+                "warnings": ["Путь заблокирован препятствиями!"]
+            }
+        else:
+            routes_output[mode] = route_result
+
+    return {
+        "start": start,
+        "finish": finish,
+        "boat_config": config_name,
+        "modes": routes_output
     }
