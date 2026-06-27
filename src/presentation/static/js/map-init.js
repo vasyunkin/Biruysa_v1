@@ -1,6 +1,6 @@
 // --- Инициализация карты ---
 const map = L.map('map', {
-    center: [55.87, 92.15], // Центрирование на цепочку Дивногорск -> Бирюса
+    center: [55.87, 92.15],
     zoom: 11,
     zoomControl: false,
     attributionControl: false,
@@ -12,7 +12,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 
 L.control.zoom({ position: 'topright' }).addTo(map);
 
-// Отрисовка интерактивных узлов графа
+// --- Отрисовка интерактивных узлов графа ---
 function renderGraphNodes() {
     for (const [nodeName, coords] of Object.entries(GRAPH_NODES)) {
         const markerElement = document.createElement('div');
@@ -28,13 +28,19 @@ function renderGraphNodes() {
             })
         }).addTo(map);
 
-        // Вешаем событие клика на вершину графа через модуль route.js
         marker.on('click', () => handleNodeClick(nodeName));
         state.nodeMarkers[nodeName] = marker;
     }
-    // Если передан объект с полными деталями (режим, конфигурация и т.д.)
+}
+
+// --- Обновление информации о маршруте (карточка) ---
+function updateRouteInfo(data) {
+    if (!data) {
+        routeSummary.innerHTML = 'Выберите точки на карте';
+        return;
+    }
     if (data.mode) {
-        routeInfo.innerHTML = `
+        routeSummary.innerHTML = `
             <div style="margin-bottom: 8px;"><strong>Режим:</strong> ${data.mode}</div>
             <div style="margin-bottom: 8px;"><strong>Длина:</strong> ${data.length || '—'} км</div>
             <div style="margin-bottom: 8px;"><strong>Время:</strong> ${data.time || '—'} мин</div>
@@ -46,8 +52,7 @@ function renderGraphNodes() {
             <div style="margin-bottom: 8px;"><strong>Запас хода:</strong> ${data.range || '—'} км</div>
         `;
     } else {
-        // Старый формат (для mock-клика по карте)
-        routeInfo.innerHTML = `
+        routeSummary.innerHTML = `
             <div style="margin-bottom: 12px;">
                 <strong>Длина:</strong> ${data.length || '—'} км<br>
                 <strong>Время:</strong> ${data.time || '—'} мин<br>
@@ -58,4 +63,19 @@ function renderGraphNodes() {
             </div>
         `;
     }
+}
+
+// --- Отображение маршрута на карте (для mock-данных и ручного выбора) ---
+function displayRoute(coordinates) {
+    if (state.routeLayers) {
+        state.routeLayers.forEach(layer => map.removeLayer(layer));
+        state.routeLayers = [];
+    }
+    const polyline = L.polyline(coordinates, {
+        color: '#6fc3ff',
+        weight: 5,
+        opacity: 0.85
+    }).addTo(map);
+    state.routeLayers.push(polyline);
+    map.fitBounds(polyline.getBounds(), { padding: [40, 40] });
 }
