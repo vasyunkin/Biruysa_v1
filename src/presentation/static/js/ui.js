@@ -1,15 +1,9 @@
-// static/js/ui.js
-
-// Все DOM-элементы теперь в dom.js – используем глобальные переменные
-
-// --- Нижняя панель – переключение вкладок ---
 bottomBtns.forEach(btn => {
     btn.addEventListener('click', function() {
         bottomBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         const tab = this.dataset.tab;
 
-        // Скрываем все панели
         routePanel.classList.add('hidden');
         boatPanel.classList.add('hidden');
 
@@ -19,24 +13,17 @@ bottomBtns.forEach(btn => {
                 break;
             case 'boat':
                 boatPanel.classList.remove('hidden');
-                if (typeof updateBoatUI === 'function') {
-                    updateBoatUI(); // обновляем актуальные значения
-                }
+                updateBoatUI();
                 break;
             case 'compare':
-                alert('Сравнение режимов будет доступно после выбора маршрута.');
+                alert('Сравнение: Все 4 режима уже активны на вкладках панели "Маршрут"!');
                 break;
             case 'log':
-                alert('Журнал маршрутов (сохранённые треки)');
+                alert('Журнал сохраненных треков (будет доступен в бортовой версии)');
                 break;
         }
     });
 });
 
-// --- Дополнительные кнопки верхней панели ---
-document.getElementById('layers-btn').addEventListener('click', function() {
-    alert('Смена стиля карты: Обычный / Ночной / Спутник');
-});
-document.getElementById('menu-btn').addEventListener('click', function() {
-    alert('Главное меню: Загрузка карты, Настройки, Офлайн-режим');
-});
+layersBtn.addEventListener('click', () => alert('Переключение слоев подложки карт ( offline-first )'));
+menuBtn.addEventListener('click', () => alert('Системное меню штурмана аэролодки Raptor 650'));

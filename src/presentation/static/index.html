@@ -4,20 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Цифровой штурман аэролодки</title>
-    <!-- Подключаем стили Leaflet -->
-    <!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />-->
-    <!-- Локальный CSS Leaflet -->
     <link rel="stylesheet" href="static/libs/leaflet/leaflet.css">
-    <!-- Подключаем пользовательские стили -->
     <link rel="stylesheet" href="static/css/base.css">
     <link rel="stylesheet" href="static/css/layout.css">
     <link rel="stylesheet" href="static/css/components.css">
 </head>
 <body>
-    <!-- Основной контейнер для карты -->
     <div id="map"></div>
 
-    <!-- Верхняя панель (меню) -->
     <div id="top-bar">
         <button id="menu-btn">☰</button>
         <span id="app-title">Цифровой штурман</span>
@@ -26,13 +20,30 @@
         </div>
     </div>
 
-    <!-- Боковая панель: Маршрут -->
     <div id="route-panel" class="side-panel">
-        <h3>📋 Маршрут</h3>
-        <div id="route-info">Выберите точки на карте</div>
+        <h3>📋 Планирование пути</h3>
+
+        <div class="node-selector-box">
+            <div id="badge-start" class="node-input-badge">🟢 Откуда: кликните точку</div>
+            <div id="badge-finish" class="node-input-badge">🔴 Куда: кликните точку</div>
+        </div>
+
+        <button id="clear-route-btn" class="primary-btn" style="background:#e74c3c; margin-bottom:15px;">❌ Сбросить точки</button>
+
+        <div id="route-results" class="hidden">
+            <div class="mode-tabs" style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:15px;">
+                <button class="primary-btn mode-tab active" data-mode="быстрый" style="font-size:12px; padding:6px;">⏱️ Быстрый</button>
+                <button class="primary-btn mode-tab" data-mode="экономичный" style="font-size:12px; padding:6px; background:#7f8c8d;">⛽ Эконом</button>
+                <button class="primary-btn mode-tab" data-mode="кратчайший" style="font-size:12px; padding:6px; background:#7f8c8d;">📏 Короткий</button>
+                <button class="primary-btn mode-tab" data-mode="безопасный" style="font-size:12px; padding:6px; background:#7f8c8d;">🛡️ Безопасный</button>
+            </div>
+
+            <div id="route-info-card" style="background:rgba(0,0,0,0.02); padding:12px; border-radius:8px; border:1px solid var(--border-glass);">
+                <div id="route-summary">Выберите режим для просмотра деталей</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Боковая панель: Настройки лодки -->
     <div id="boat-panel" class="side-panel hidden">
         <h3>⛵ Настройки лодки</h3>
         <div class="boat-param">
@@ -44,9 +55,9 @@
         <div class="boat-param">
             <label>Конфигурация</label>
             <div class="radio-group">
-                <input type="radio" id="config-no" name="config" value="no" checked>
+                <input type="radio" id="config-no" name="config" value="без поддува" checked>
                 <label for="config-no">Без поддува</label>
-                <input type="radio" id="config-yes" name="config" value="yes">
+                <input type="radio" id="config-yes" name="config" value="с поддувом">
                 <label for="config-yes">С поддувом</label>
             </div>
         </div>
@@ -55,8 +66,8 @@
             <input type="range" id="load-slider" min="0.5" max="1.5" step="0.1" value="1.2">
         </div>
         <div class="boat-param">
-            <label>Запас топлива: <span id="fuel-value">300</span> л</label>
-            <input type="range" id="fuel-slider" min="50" max="370" step="10" value="300">
+            <label>Запас топлива: <span id="fuel-value">370</span> л</label>
+            <input type="range" id="fuel-slider" min="50" max="370" step="10" value="370">
         </div>
         <div class="boat-param">
             <label>Резерв топлива: <span id="reserve-value">20</span>%</label>
@@ -66,7 +77,6 @@
         <div id="boat-status" style="margin-top:10px; font-size:13px; color:#8899b0;"></div>
     </div>
 
-    <!-- Нижняя панель (быстрый доступ) -->
     <div id="bottom-bar">
         <button class="bottom-btn active" data-tab="route">🗺️ Маршрут</button>
         <button class="bottom-btn" data-tab="boat">⛵ Лодка</button>
@@ -74,25 +84,18 @@
         <button class="bottom-btn" data-tab="log">📋 Журнал</button>
     </div>
 
-    <!-- Правая панель инструментов -->
     <div id="right-tools">
         <button id="tool-search" title="Поиск">🔍</button>
         <button id="tool-measure" title="Измерить">📏</button>
         <button id="tool-route" title="Построить маршрут">📍</button>
-        <!-- Удаляем эту строку: -->
-        <!-- <button id="tool-attribution" title="Переключить атрибуцию">©</button> -->
     </div>
 
-    <!-- Leaflet -->
     <script src="static/libs/leaflet/leaflet.js"></script>
 
-    <!-- DOM-элементы (должны быть доступны во всех остальных скриптах) -->
     <script src="static/js/dom.js"></script>
 
-    <!-- Остальные модули -->
     <script src="static/js/config.js"></script>
     <script src="static/js/map-init.js"></script>
-    <!--<script src="static/js/attribution.js"></script>--> <!-- Добавляем сюда -->
     <script src="static/js/boat.js"></script>
     <script src="static/js/ui.js"></script>
     <script src="static/js/route.js"></script>
