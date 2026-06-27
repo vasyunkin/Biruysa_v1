@@ -10,6 +10,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19,
 }).addTo(map);
 
+L.control.zoom({ position: 'topright' }).addTo(map);
+
 // --- Отрисовка интерактивных узлов графа ---
 function renderGraphNodes() {
     for (const [nodeName, coords] of Object.entries(GRAPH_NODES)) {
