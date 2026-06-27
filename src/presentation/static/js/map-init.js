@@ -1,64 +1,36 @@
-// static/js/map-init.js
-
 // --- Инициализация карты ---
 const map = L.map('map', {
-    center: [56.0, 93.0],
-    zoom: 10,
+    center: [55.87, 92.15], // Центрирование на цепочку Дивногорск -> Бирюса
+    zoom: 11,
     zoomControl: false,
-    attributionControl: false, // Отключаем атрибуцию полностью
+    attributionControl: false,
 });
 
-// Светлый тайловый слой (без атрибуции)
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '', // Пустая строка, чтобы не было надписи
-    subdomains: 'abcd',
     maxZoom: 19,
 }).addTo(map);
 
-// Добавляем контролы масштаба
-L.control.zoom({
-    position: 'topright'
-}).addTo(map);
+L.control.zoom({ position: 'topright' }).addTo(map);
 
-// --- Функции работы с картой ---
+// Отрисовка интерактивных узлов графа
+function renderGraphNodes() {
+    for (const [nodeName, coords] of Object.entries(GRAPH_NODES)) {
+        const markerElement = document.createElement('div');
+        markerElement.className = 'graph-node-marker';
+        markerElement.innerHTML = `⬤<div class="node-label">${nodeName}</div>`;
 
-// Функция добавления маркера
-function addMarker(lat, lng, label) {
-    const marker = L.marker([lat, lng], {
-        icon: L.divIcon({
-            className: 'custom-marker',
-            html: `<div style="background: ${label === 'A' ? '#4caf50' : '#f44336'}; 
-                          width: 20px; height: 20px; border-radius: 50%; 
-                          border: 2px solid white; display: flex; 
-                          align-items: center; justify-content: center; 
-                          color: white; font-weight: bold; font-size: 12px;">
-                    ${label}
-                   </div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10],
-        })
-    }).addTo(map);
-    return marker;
-}
+        const marker = L.marker(coords, {
+            icon: L.divIcon({
+                html: markerElement,
+                className: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            })
+        }).addTo(map);
 
-// Отображение маршрута
-function displayRoute(coordinates) {
-    if (state.routeLayer) {
-        map.removeLayer(state.routeLayer);
-    }
-    state.routeLayer = L.polyline(coordinates, {
-        color: '#6fc3ff',
-        weight: 4,
-        opacity: 0.9,
-    }).addTo(map);
-    map.fitBounds(state.routeLayer.getBounds(), { padding: [50, 50] });
-}
-
-// Обновление информации о маршруте (расширенная версия)
-function updateRouteInfo(data) {
-    if (!data) {
-        routeInfo.innerHTML = 'Выберите точки на карте';
-        return;
+        // Вешаем событие клика на вершину графа через модуль route.js
+        marker.on('click', () => handleNodeClick(nodeName));
+        state.nodeMarkers[nodeName] = marker;
     }
     // Если передан объект с полными деталями (режим, конфигурация и т.д.)
     if (data.mode) {

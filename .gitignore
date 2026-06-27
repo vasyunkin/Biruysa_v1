@@ -4,3 +4,6 @@
 
 /.vs
 /src/main/__pycache__
+/src/main/__pycache__/app.cpython-312.pyc
+/src/presentation/api/routes/__pycache__/navigator_router.cpython-312.pyc
+/src/services/__pycache__/navigator.cpython-312.pyc

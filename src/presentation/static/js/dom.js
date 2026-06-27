@@ -1,19 +1,22 @@
-// static/js/dom.js
-
 // --- Панели ---
 const routePanel = document.getElementById('route-panel');
 const boatPanel = document.getElementById('boat-panel');
 
-// --- Информация о маршруте ---
-const routeInfo = document.getElementById('route-info');
+// --- Индикаторы выбора точек ---
+const badgeStart = document.getElementById('badge-start');
+const badgeFinish = document.getElementById('badge-finish');
+const clearRouteBtn = document.getElementById('clear-route-btn');
+const routeResultsBox = document.getElementById('route-results');
+const routeSummary = document.getElementById('route-summary');
 
-// --- Нижняя панель (кнопки) ---
+// --- Вкладки режимов ---
+const modeTabs = document.querySelectorAll('.mode-tab');
+
+// --- Нижня и Правая панели ---
 const bottomBtns = document.querySelectorAll('.bottom-btn');
-
-// --- Правая панель (инструменты) ---
 const toolRouteBtn = document.getElementById('tool-route');
 
-// --- Элементы управления лодкой ---
+// --- Управление лодкой ---
 const boatModel = document.getElementById('boat-model');
 const configNo = document.getElementById('config-no');
 const configYes = document.getElementById('config-yes');
@@ -26,7 +29,7 @@ const reserveValue = document.getElementById('reserve-value');
 const applyBoatBtn = document.getElementById('apply-boat-settings');
 const boatStatus = document.getElementById('boat-status');
 
-// --- Верхняя панель (дополнительные кнопки) ---
+// --- Верхняя панель ---
 const layersBtn = document.getElementById('layers-btn');
 const menuBtn = document.getElementById('menu-btn');
 

@@ -108,6 +108,92 @@
     transition: color var(--transition);
 }
 
+/* ===== Интерактивные вершины графа на карте ===== */
+.graph-node-marker {
+    background: var(--bg-panel);
+    border: 2px solid var(--text-muted);
+    color: var(--text-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Эффект наведения на вершину */
+.graph-node-marker:hover {
+    transform: scale(1.15);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    z-index: 1000 !important;
+}
+
+/* Состояние: Выбрана как СТАРТ */
+.graph-node-marker.node-start {
+    border-color: #2ecc71 !important;
+    background: #2ecc71 !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px #2ecc71;
+}
+
+/* Состояние: Выбрана как ФИНИШ */
+.graph-node-marker.node-finish {
+    border-color: #e74c3c !important;
+    background: #e74c3c !important;
+    color: #fff !important;
+    box-shadow: 0 0 15px #e74c3c;
+}
+
+/* Текстовые подписи рядом с вершинами */
+.node-label {
+    position: absolute;
+    bottom: -20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bg-glass);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-glass);
+    color: var(--text-primary);
+    pointer-events: none;
+}
+
+/* Панель управления выбором точек внутри "Маршрут" */
+.node-selector-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-glass);
+}
+.dark-theme .node-selector-box {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.node-input-badge {
+    flex: 1;
+    padding: 6px 10px;
+    background: var(--bg-body);
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px dashed var(--text-muted);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.node-input-badge.filled {
+    border-style: solid;
+    border-color: var(--accent);
+    font-weight: 600;
+}
+
 /* ===== Comparison Table ===== */
 #comparison-section {
     width: 700px;

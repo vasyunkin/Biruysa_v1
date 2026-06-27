@@ -7,7 +7,6 @@ bottomBtns.forEach(btn => {
         this.classList.add('active');
         const tab = this.dataset.tab;
 
-        // Скрываем все панели
         routePanel.classList.add('hidden');
         boatPanel.classList.add('hidden');
         comparisonSection.classList.add('hidden');
@@ -18,6 +17,7 @@ bottomBtns.forEach(btn => {
                 break;
             case 'boat':
                 boatPanel.classList.remove('hidden');
+                updateBoatUI();
                 if (typeof updateBoatUI === 'function') {
                     updateBoatUI(); // обновляем актуальные значения
                 }
@@ -30,16 +30,11 @@ bottomBtns.forEach(btn => {
                 comparisonSection.classList.remove('hidden');
                 break;
             case 'log':
-                alert('Журнал маршрутов (сохранённые треки)');
+                alert('Журнал сохраненных треков (будет доступен в бортовой версии)');
                 break;
         }
     });
 });
 
-// --- Дополнительные кнопки верхней панели ---
-document.getElementById('layers-btn').addEventListener('click', function() {
-    alert('Смена стиля карты: Обычный / Ночной / Спутник');
-});
-document.getElementById('menu-btn').addEventListener('click', function() {
-    alert('Главное меню: Загрузка карты, Настройки, Офлайн-режим');
-});
+layersBtn.addEventListener('click', () => alert('Переключение слоев подложки карт ( offline-first )'));
+menuBtn.addEventListener('click', () => alert('Системное меню штурмана аэролодки Raptor 650'));
